@@ -40,11 +40,33 @@ type Kombinasi = {
   tipePenggunaan: string;
   budgetMin: number;
   budgetMax: number;
+
   piston?: SelectedSparepart | null;
   blokMesin?: SelectedSparepart | null;
   camshaft?: SelectedSparepart | null;
   fuelSystem?: SelectedSparepart | null;
   knalpot?: SelectedSparepart | null;
+
+  ecu?: SelectedSparepart | null;
+  oli?: SelectedSparepart | null;
+  kampasKopling?: SelectedSparepart | null;
+  perKopling?: SelectedSparepart | null;
+  throttleBody?: SelectedSparepart | null;
+  busi?: SelectedSparepart | null;
+  stangPiston?: SelectedSparepart | null;
+  klep?: SelectedSparepart | null;
+  perKlep?: SelectedSparepart | null;
+  intakeManifold?: SelectedSparepart | null;
+  radiator?: SelectedSparepart | null;
+  injector?: SelectedSparepart | null;
+  crankshaft?: SelectedSparepart | null;
+  pistonRing?: SelectedSparepart | null;
+  cylinderHead?: SelectedSparepart | null;
+  coil?: SelectedSparepart | null;
+  fuelPump?: SelectedSparepart | null;
+  airRadiator?: SelectedSparepart | null;
+  bateraiAki?: SelectedSparepart | null;
+
   deskripsi: string;
   fiturText: string;
   createdAt?: unknown;
@@ -59,11 +81,33 @@ const initialForm = {
   tipePenggunaan: "",
   budgetMin: "",
   budgetMax: "",
+
   pistonId: "",
   blokMesinId: "",
   camshaftId: "",
   fuelSystemId: "",
   knalpotId: "",
+
+  ecuId: "",
+  oliId: "",
+  kampasKoplingId: "",
+  perKoplingId: "",
+  throttleBodyId: "",
+  busiId: "",
+  stangPistonId: "",
+  klepId: "",
+  perKlepId: "",
+  intakeManifoldId: "",
+  radiatorId: "",
+  injectorId: "",
+  crankshaftId: "",
+  pistonRingId: "",
+  cylinderHeadId: "",
+  coilId: "",
+  fuelPumpId: "",
+  airRadiatorId: "",
+  bateraiAkiId: "",
+
   deskripsi: "",
 };
 
@@ -126,20 +170,74 @@ export default function AdminKombinasiPage() {
     };
   };
 
+  const renderSparepartSelect = (
+    label: string,
+    name: keyof typeof initialForm,
+    kategori: string,
+    placeholder: string,
+  ) => {
+    return (
+      <div>
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          {label}
+        </label>
+        <select
+          name={name}
+          value={form[name]}
+          onChange={handleChange}
+          className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-orange-500"
+        >
+          <option value="">{placeholder}</option>
+          {getSparepartByKategori(kategori).map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.nama} {item.merk ? `- ${item.merk}` : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
   const filteredKombinasi = useMemo(() => {
     return kombinasi.filter((item) => {
       const keyword = search.toLowerCase();
+
+      const sparepartText = [
+        item.piston?.nama,
+        item.blokMesin?.nama,
+        item.camshaft?.nama,
+        item.fuelSystem?.nama,
+        item.knalpot?.nama,
+        item.ecu?.nama,
+        item.oli?.nama,
+        item.kampasKopling?.nama,
+        item.perKopling?.nama,
+        item.throttleBody?.nama,
+        item.busi?.nama,
+        item.stangPiston?.nama,
+        item.klep?.nama,
+        item.perKlep?.nama,
+        item.intakeManifold?.nama,
+        item.radiator?.nama,
+        item.injector?.nama,
+        item.crankshaft?.nama,
+        item.pistonRing?.nama,
+        item.cylinderHead?.nama,
+        item.coil?.nama,
+        item.fuelPump?.nama,
+        item.airRadiator?.nama,
+        item.bateraiAki?.nama,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
 
       const matchSearch =
         item.namaKombinasi?.toLowerCase().includes(keyword) ||
         item.jenisMotor?.toLowerCase().includes(keyword) ||
         item.kapasitasMesin?.toLowerCase().includes(keyword) ||
         item.tipePenggunaan?.toLowerCase().includes(keyword) ||
-        item.piston?.nama?.toLowerCase().includes(keyword) ||
-        item.blokMesin?.nama?.toLowerCase().includes(keyword) ||
-        item.camshaft?.nama?.toLowerCase().includes(keyword) ||
-        item.fuelSystem?.nama?.toLowerCase().includes(keyword) ||
-        item.knalpot?.nama?.toLowerCase().includes(keyword);
+        sparepartText.includes(keyword);
 
       const matchPenggunaan = filterPenggunaan
         ? item.tipePenggunaan === filterPenggunaan
@@ -167,27 +265,39 @@ export default function AdminKombinasiPage() {
   };
 
   const generateFiturText = () => {
-    const piston = getSelectedSparepart(form.pistonId);
-    const blokMesin = getSelectedSparepart(form.blokMesinId);
-    const camshaft = getSelectedSparepart(form.camshaftId);
-    const fuelSystem = getSelectedSparepart(form.fuelSystemId);
-    const knalpot = getSelectedSparepart(form.knalpotId);
+    const selectedParts = [
+      getSelectedSparepart(form.pistonId),
+      getSelectedSparepart(form.blokMesinId),
+      getSelectedSparepart(form.camshaftId),
+      getSelectedSparepart(form.fuelSystemId),
+      getSelectedSparepart(form.knalpotId),
+      getSelectedSparepart(form.ecuId),
+      getSelectedSparepart(form.oliId),
+      getSelectedSparepart(form.kampasKoplingId),
+      getSelectedSparepart(form.perKoplingId),
+      getSelectedSparepart(form.throttleBodyId),
+      getSelectedSparepart(form.busiId),
+      getSelectedSparepart(form.stangPistonId),
+      getSelectedSparepart(form.klepId),
+      getSelectedSparepart(form.perKlepId),
+      getSelectedSparepart(form.intakeManifoldId),
+      getSelectedSparepart(form.radiatorId),
+      getSelectedSparepart(form.injectorId),
+      getSelectedSparepart(form.crankshaftId),
+      getSelectedSparepart(form.pistonRingId),
+      getSelectedSparepart(form.cylinderHeadId),
+      getSelectedSparepart(form.coilId),
+      getSelectedSparepart(form.fuelPumpId),
+      getSelectedSparepart(form.airRadiatorId),
+      getSelectedSparepart(form.bateraiAkiId),
+    ];
 
     return [
       form.namaKombinasi,
       form.jenisMotor,
       form.kapasitasMesin,
       form.tipePenggunaan,
-      piston?.nama,
-      piston?.merk,
-      blokMesin?.nama,
-      blokMesin?.merk,
-      camshaft?.nama,
-      camshaft?.merk,
-      fuelSystem?.nama,
-      fuelSystem?.merk,
-      knalpot?.nama,
-      knalpot?.merk,
+      ...selectedParts.flatMap((item) => [item?.nama, item?.merk]),
       form.deskripsi,
     ]
       .filter(Boolean)
@@ -202,14 +312,11 @@ export default function AdminKombinasiPage() {
       !form.namaKombinasi ||
       !form.jenisMotor ||
       !form.kapasitasMesin ||
-      !form.tipePenggunaan ||
-      !form.pistonId ||
-      !form.blokMesinId ||
-      !form.camshaftId ||
-      !form.fuelSystemId ||
-      !form.knalpotId
+      !form.tipePenggunaan
     ) {
-      alert("Semua data utama dan pilihan sparepart wajib diisi.");
+      alert(
+        "Nama kombinasi, jenis motor, kapasitas mesin, dan tipe penggunaan wajib diisi.",
+      );
       return;
     }
 
@@ -229,6 +336,26 @@ export default function AdminKombinasiPage() {
         camshaft: getSelectedSparepart(form.camshaftId),
         fuelSystem: getSelectedSparepart(form.fuelSystemId),
         knalpot: getSelectedSparepart(form.knalpotId),
+
+        ecu: getSelectedSparepart(form.ecuId),
+        oli: getSelectedSparepart(form.oliId),
+        kampasKopling: getSelectedSparepart(form.kampasKoplingId),
+        perKopling: getSelectedSparepart(form.perKoplingId),
+        throttleBody: getSelectedSparepart(form.throttleBodyId),
+        busi: getSelectedSparepart(form.busiId),
+        stangPiston: getSelectedSparepart(form.stangPistonId),
+        klep: getSelectedSparepart(form.klepId),
+        perKlep: getSelectedSparepart(form.perKlepId),
+        intakeManifold: getSelectedSparepart(form.intakeManifoldId),
+        radiator: getSelectedSparepart(form.radiatorId),
+        injector: getSelectedSparepart(form.injectorId),
+        crankshaft: getSelectedSparepart(form.crankshaftId),
+        pistonRing: getSelectedSparepart(form.pistonRingId),
+        cylinderHead: getSelectedSparepart(form.cylinderHeadId),
+        coil: getSelectedSparepart(form.coilId),
+        fuelPump: getSelectedSparepart(form.fuelPumpId),
+        airRadiator: getSelectedSparepart(form.airRadiatorId),
+        bateraiAki: getSelectedSparepart(form.bateraiAkiId),
 
         deskripsi: form.deskripsi,
         fiturText: generateFiturText(),
@@ -266,11 +393,33 @@ export default function AdminKombinasiPage() {
       tipePenggunaan: item.tipePenggunaan || "",
       budgetMin: String(item.budgetMin || ""),
       budgetMax: String(item.budgetMax || ""),
+
       pistonId: item.piston?.id || "",
       blokMesinId: item.blokMesin?.id || "",
       camshaftId: item.camshaft?.id || "",
       fuelSystemId: item.fuelSystem?.id || "",
       knalpotId: item.knalpot?.id || "",
+
+      ecuId: item.ecu?.id || "",
+      oliId: item.oli?.id || "",
+      kampasKoplingId: item.kampasKopling?.id || "",
+      perKoplingId: item.perKopling?.id || "",
+      throttleBodyId: item.throttleBody?.id || "",
+      busiId: item.busi?.id || "",
+      stangPistonId: item.stangPiston?.id || "",
+      klepId: item.klep?.id || "",
+      perKlepId: item.perKlep?.id || "",
+      intakeManifoldId: item.intakeManifold?.id || "",
+      radiatorId: item.radiator?.id || "",
+      injectorId: item.injector?.id || "",
+      crankshaftId: item.crankshaft?.id || "",
+      pistonRingId: item.pistonRing?.id || "",
+      cylinderHeadId: item.cylinderHead?.id || "",
+      coilId: item.coil?.id || "",
+      fuelPumpId: item.fuelPump?.id || "",
+      airRadiatorId: item.airRadiator?.id || "",
+      bateraiAkiId: item.bateraiAki?.id || "",
+
       deskripsi: item.deskripsi || "",
     });
   };
@@ -295,12 +444,32 @@ export default function AdminKombinasiPage() {
     }).format(value || 0);
   };
 
-  const totalHarga =
-    (getSelectedSparepart(form.pistonId)?.harga || 0) +
-    (getSelectedSparepart(form.blokMesinId)?.harga || 0) +
-    (getSelectedSparepart(form.camshaftId)?.harga || 0) +
-    (getSelectedSparepart(form.fuelSystemId)?.harga || 0) +
-    (getSelectedSparepart(form.knalpotId)?.harga || 0);
+  const totalHarga = [
+    form.pistonId,
+    form.blokMesinId,
+    form.camshaftId,
+    form.fuelSystemId,
+    form.knalpotId,
+    form.ecuId,
+    form.oliId,
+    form.kampasKoplingId,
+    form.perKoplingId,
+    form.throttleBodyId,
+    form.busiId,
+    form.stangPistonId,
+    form.klepId,
+    form.perKlepId,
+    form.intakeManifoldId,
+    form.radiatorId,
+    form.injectorId,
+    form.crankshaftId,
+    form.pistonRingId,
+    form.cylinderHeadId,
+    form.coilId,
+    form.fuelPumpId,
+    form.airRadiatorId,
+    form.bateraiAkiId,
+  ].reduce((total, id) => total + (getSelectedSparepart(id)?.harga || 0), 0);
 
   return (
     <div>
@@ -430,100 +599,126 @@ export default function AdminKombinasiPage() {
               />
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
-                Piston
-              </label>
-              <select
-                name="pistonId"
-                value={form.pistonId}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-orange-500"
-              >
-                <option value="">Pilih piston</option>
-                {getSparepartByKategori("Piston").map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.nama} {item.merk ? `- ${item.merk}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {renderSparepartSelect(
+              "Piston",
+              "pistonId",
+              "Piston",
+              "Pilih piston",
+            )}
+            {renderSparepartSelect(
+              "Blok Mesin",
+              "blokMesinId",
+              "Blok Mesin",
+              "Pilih blok mesin",
+            )}
+            {renderSparepartSelect(
+              "Camshaft",
+              "camshaftId",
+              "Camshaft",
+              "Pilih camshaft",
+            )}
+            {renderSparepartSelect(
+              "Sistem Bahan Bakar",
+              "fuelSystemId",
+              "Sistem Bahan Bakar",
+              "Pilih sistem bahan bakar",
+            )}
+            {renderSparepartSelect(
+              "Knalpot",
+              "knalpotId",
+              "Knalpot",
+              "Pilih knalpot",
+            )}
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
-                Blok Mesin
-              </label>
-              <select
-                name="blokMesinId"
-                value={form.blokMesinId}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-orange-500"
-              >
-                <option value="">Pilih blok mesin</option>
-                {getSparepartByKategori("Blok Mesin").map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.nama} {item.merk ? `- ${item.merk}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
-                Camshaft
-              </label>
-              <select
-                name="camshaftId"
-                value={form.camshaftId}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-orange-500"
-              >
-                <option value="">Pilih camshaft</option>
-                {getSparepartByKategori("Camshaft").map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.nama} {item.merk ? `- ${item.merk}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
-                Sistem Bahan Bakar
-              </label>
-              <select
-                name="fuelSystemId"
-                value={form.fuelSystemId}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-orange-500"
-              >
-                <option value="">Pilih sistem bahan bakar</option>
-                {getSparepartByKategori("Sistem Bahan Bakar").map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.nama} {item.merk ? `- ${item.merk}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
-                Knalpot
-              </label>
-              <select
-                name="knalpotId"
-                value={form.knalpotId}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-orange-500"
-              >
-                <option value="">Pilih knalpot</option>
-                {getSparepartByKategori("Knalpot").map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.nama} {item.merk ? `- ${item.merk}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {renderSparepartSelect("Ecu", "ecuId", "Ecu", "Pilih ecu")}
+            {renderSparepartSelect("Oli", "oliId", "Oli", "Pilih oli")}
+            {renderSparepartSelect(
+              "Kampas Kopling",
+              "kampasKoplingId",
+              "Kampas Kopling",
+              "Pilih kampas kopling",
+            )}
+            {renderSparepartSelect(
+              "Per Kopling",
+              "perKoplingId",
+              "Per Kopling",
+              "Pilih per kopling",
+            )}
+            {renderSparepartSelect(
+              "Throttle Body",
+              "throttleBodyId",
+              "Throttle Body",
+              "Pilih throttle body",
+            )}
+            {renderSparepartSelect("Busi", "busiId", "Busi", "Pilih busi")}
+            {renderSparepartSelect(
+              "Stang Piston",
+              "stangPistonId",
+              "Stang Piston",
+              "Pilih stang piston",
+            )}
+            {renderSparepartSelect("Klep", "klepId", "Klep", "Pilih klep")}
+            {renderSparepartSelect(
+              "Per Klep",
+              "perKlepId",
+              "Per Klep",
+              "Pilih per klep",
+            )}
+            {renderSparepartSelect(
+              "Intake Manifold",
+              "intakeManifoldId",
+              "Intake Manifold",
+              "Pilih intake manifold",
+            )}
+            {renderSparepartSelect(
+              "Radiator",
+              "radiatorId",
+              "Radiator",
+              "Pilih radiator",
+            )}
+            {renderSparepartSelect(
+              "Injector",
+              "injectorId",
+              "Injector",
+              "Pilih injector",
+            )}
+            {renderSparepartSelect(
+              "Crankshaft (Kruk As)",
+              "crankshaftId",
+              "Crankshaft (Kruk As)",
+              "Pilih crankshaft",
+            )}
+            {renderSparepartSelect(
+              "Piston Ring",
+              "pistonRingId",
+              "Piston Ring",
+              "Pilih piston ring",
+            )}
+            {renderSparepartSelect(
+              "Cylinder Head",
+              "cylinderHeadId",
+              "Cylinder Head",
+              "Pilih cylinder head",
+            )}
+            {renderSparepartSelect("Coil", "coilId", "Coil", "Pilih coil")}
+            {renderSparepartSelect(
+              "Fuel Pump",
+              "fuelPumpId",
+              "Fuel Pump",
+              "Pilih fuel pump",
+            )}
+            {renderSparepartSelect(
+              "Air Radiator",
+              "airRadiatorId",
+              "Air Radiator",
+              "Pilih air radiator",
+            )}
+            {renderSparepartSelect(
+              "Baterai/Aki",
+              "bateraiAkiId",
+              "Baterai/Aki",
+              "Pilih baterai/aki",
+            )}
 
             <div className="rounded-xl bg-orange-50 p-4 md:col-span-2">
               <p className="text-sm text-slate-600">Estimasi total harga:</p>
@@ -620,7 +815,7 @@ export default function AdminKombinasiPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1200px] text-left">
+            <table className="w-full min-w-[1300px] text-left">
               <thead className="bg-slate-50 text-sm text-slate-600">
                 <tr>
                   <th className="px-5 py-4">Kombinasi</th>
@@ -665,12 +860,33 @@ export default function AdminKombinasiPage() {
                     </td>
 
                     <td className="px-5 py-4">
-                      <div className="max-w-[360px] space-y-1 text-xs text-slate-600">
+                      <div className="max-w-[460px] space-y-1 text-xs text-slate-600">
                         <p>Piston: {item.piston?.nama || "-"}</p>
                         <p>Blok: {item.blokMesin?.nama || "-"}</p>
                         <p>Camshaft: {item.camshaft?.nama || "-"}</p>
                         <p>Bahan Bakar: {item.fuelSystem?.nama || "-"}</p>
                         <p>Knalpot: {item.knalpot?.nama || "-"}</p>
+                        <p>Ecu: {item.ecu?.nama || "-"}</p>
+                        <p>Oli: {item.oli?.nama || "-"}</p>
+                        <p>Kampas Kopling: {item.kampasKopling?.nama || "-"}</p>
+                        <p>Per Kopling: {item.perKopling?.nama || "-"}</p>
+                        <p>Throttle Body: {item.throttleBody?.nama || "-"}</p>
+                        <p>Busi: {item.busi?.nama || "-"}</p>
+                        <p>Stang Piston: {item.stangPiston?.nama || "-"}</p>
+                        <p>Klep: {item.klep?.nama || "-"}</p>
+                        <p>Per Klep: {item.perKlep?.nama || "-"}</p>
+                        <p>
+                          Intake Manifold: {item.intakeManifold?.nama || "-"}
+                        </p>
+                        <p>Radiator: {item.radiator?.nama || "-"}</p>
+                        <p>Injector: {item.injector?.nama || "-"}</p>
+                        <p>Crankshaft: {item.crankshaft?.nama || "-"}</p>
+                        <p>Piston Ring: {item.pistonRing?.nama || "-"}</p>
+                        <p>Cylinder Head: {item.cylinderHead?.nama || "-"}</p>
+                        <p>Coil: {item.coil?.nama || "-"}</p>
+                        <p>Fuel Pump: {item.fuelPump?.nama || "-"}</p>
+                        <p>Air Radiator: {item.airRadiator?.nama || "-"}</p>
+                        <p>Baterai/Aki: {item.bateraiAki?.nama || "-"}</p>
                       </div>
                     </td>
 

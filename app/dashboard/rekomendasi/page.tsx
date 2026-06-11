@@ -12,6 +12,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { Bike, Calculator, Search } from "lucide-react";
 
+type SelectedSparepart = {
+  id: string;
+  nama: string;
+  kategori: string;
+  merk?: string;
+  harga?: number;
+};
+
 type Kombinasi = {
   id: string;
   namaKombinasi: string;
@@ -20,13 +28,33 @@ type Kombinasi = {
   tipePenggunaan: string;
   budgetMin: number;
   budgetMax: number;
-  piston: string;
-  blokMesin: string;
-  camshaft: string;
-  klep: string;
-  ecu: string;
-  injektorKarburator: string;
-  knalpot: string;
+
+  piston?: SelectedSparepart | null;
+  blokMesin?: SelectedSparepart | null;
+  camshaft?: SelectedSparepart | null;
+  fuelSystem?: SelectedSparepart | null;
+  knalpot?: SelectedSparepart | null;
+
+  ecu?: SelectedSparepart | null;
+  oli?: SelectedSparepart | null;
+  kampasKopling?: SelectedSparepart | null;
+  perKopling?: SelectedSparepart | null;
+  throttleBody?: SelectedSparepart | null;
+  busi?: SelectedSparepart | null;
+  stangPiston?: SelectedSparepart | null;
+  klep?: SelectedSparepart | null;
+  perKlep?: SelectedSparepart | null;
+  intakeManifold?: SelectedSparepart | null;
+  radiator?: SelectedSparepart | null;
+  injector?: SelectedSparepart | null;
+  crankshaft?: SelectedSparepart | null;
+  pistonRing?: SelectedSparepart | null;
+  cylinderHead?: SelectedSparepart | null;
+  coil?: SelectedSparepart | null;
+  fuelPump?: SelectedSparepart | null;
+  airRadiator?: SelectedSparepart | null;
+  bateraiAki?: SelectedSparepart | null;
+
   deskripsi: string;
   fiturText: string;
 };
@@ -99,6 +127,12 @@ export default function RekomendasiPage() {
     });
   };
 
+  const getPartText = (part?: SelectedSparepart | null) => {
+    if (!part) return "";
+
+    return [part.nama, part.kategori, part.merk].filter(Boolean).join(" ");
+  };
+
   const inputText = useMemo(() => {
     return [
       form.jenisMotor,
@@ -151,6 +185,48 @@ export default function RekomendasiPage() {
     return dotProduct / (magnitudeA * magnitudeB);
   };
 
+  const getItemText = (item: Kombinasi) => {
+    if (item.fiturText) return item.fiturText.toLowerCase();
+
+    return [
+      item.namaKombinasi,
+      item.jenisMotor,
+      item.kapasitasMesin,
+      item.tipePenggunaan,
+
+      getPartText(item.piston),
+      getPartText(item.blokMesin),
+      getPartText(item.camshaft),
+      getPartText(item.fuelSystem),
+      getPartText(item.knalpot),
+
+      getPartText(item.ecu),
+      getPartText(item.oli),
+      getPartText(item.kampasKopling),
+      getPartText(item.perKopling),
+      getPartText(item.throttleBody),
+      getPartText(item.busi),
+      getPartText(item.stangPiston),
+      getPartText(item.klep),
+      getPartText(item.perKlep),
+      getPartText(item.intakeManifold),
+      getPartText(item.radiator),
+      getPartText(item.injector),
+      getPartText(item.crankshaft),
+      getPartText(item.pistonRing),
+      getPartText(item.cylinderHead),
+      getPartText(item.coil),
+      getPartText(item.fuelPump),
+      getPartText(item.airRadiator),
+      getPartText(item.bateraiAki),
+
+      item.deskripsi,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -178,24 +254,7 @@ export default function RekomendasiPage() {
 
       const hasil: HasilItem[] = kombinasiData
         .map((item) => {
-          const itemText =
-            item.fiturText ||
-            [
-              item.namaKombinasi,
-              item.jenisMotor,
-              item.kapasitasMesin,
-              item.tipePenggunaan,
-              item.piston,
-              item.blokMesin,
-              item.camshaft,
-              item.klep,
-              item.ecu,
-              item.injektorKarburator,
-              item.knalpot,
-              item.deskripsi,
-            ]
-              .join(" ")
-              .toLowerCase();
+          const itemText = getItemText(item);
 
           let score = cosineSimilarityText(inputText, itemText);
 
@@ -203,9 +262,7 @@ export default function RekomendasiPage() {
             budgetUser >= Number(item.budgetMin || 0) &&
             budgetUser <= Number(item.budgetMax || 0);
 
-          if (budgetCocok) {
-            score += 0.15;
-          }
+          if (budgetCocok) score += 0.15;
 
           if (
             item.jenisMotor
@@ -213,6 +270,14 @@ export default function RekomendasiPage() {
               .includes(form.jenisMotor.toLowerCase())
           ) {
             score += 0.2;
+          }
+
+          if (
+            item.kapasitasMesin
+              ?.toLowerCase()
+              .includes(form.kapasitasMesin.toLowerCase())
+          ) {
+            score += 0.15;
           }
 
           if (

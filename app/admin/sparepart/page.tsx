@@ -6,11 +6,13 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { CldUploadWidget } from "next-cloudinary";
@@ -47,6 +49,28 @@ type Kategori = {
 };
 
 const penggunaanOptions = ["Harian", "Balap", "Harian & Balap"];
+
+const defaultSparepartNames = [
+  "Ecu",
+  "Oli",
+  "Kampas Kopling",
+  "Per Kopling",
+  "Throttle Body",
+  "Busi",
+  "Stang Piston",
+  "Klep",
+  "Per Klep",
+  "Intake Manifold",
+  "Radiator",
+  "Injector",
+  "Crankshaft (Kruk As)",
+  "Piston Ring",
+  "Cylinder Head",
+  "Coil",
+  "Fuel Pump",
+  "Air Radiator",
+  "Baterai/Aki",
+];
 
 const initialForm = {
   nama: "",
@@ -137,6 +161,46 @@ export default function AdminSparepartPage() {
       ...form,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleSeedDefaultData = async () => {
+    setLoading(true);
+
+    try {
+      for (const nama of defaultSparepartNames) {
+        const q = query(
+          collection(db, "spareparts"),
+          where("nama", "==", nama),
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          await addDoc(collection(db, "spareparts"), {
+            nama,
+            kategori: "",
+            merk: "",
+            spesifikasi: "",
+            kapasitasMesin: "",
+            tipePenggunaan: "",
+            harga: 0,
+            stok: 0,
+            deskripsi: `Data sparepart ${nama}. Silakan lengkapi merk, kategori, harga, stok, dan spesifikasi.`,
+            gambarUrl: "",
+            createdAt: serverTimestamp(),
+          });
+        }
+      }
+
+      alert(
+        "Data default sparepart berhasil ditambahkan. Data yang sudah ada tidak ditambahkan ulang.",
+      );
+    } catch (error) {
+      console.error(error);
+      alert("Gagal menambahkan data default sparepart.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -234,17 +298,28 @@ export default function AdminSparepartPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditId(null);
-            setForm(initialForm);
-          }}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white transition hover:bg-orange-600"
-        >
-          <Plus size={18} />
-          Tambah Sparepart
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            onClick={handleSeedDefaultData}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-orange-500 px-5 py-3 font-semibold text-orange-600 transition hover:bg-orange-50 disabled:opacity-60"
+          >
+            <Plus size={18} />
+            Input Data Default
+          </button>
+
+          <button
+            onClick={() => {
+              setShowForm(true);
+              setEditId(null);
+              setForm(initialForm);
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white transition hover:bg-orange-600"
+          >
+            <Plus size={18} />
+            Tambah Sparepart
+          </button>
+        </div>
       </div>
 
       {showForm && (
@@ -554,10 +629,12 @@ export default function AdminSparepartPage() {
                     </td>
 
                     <td className="px-5 py-4 text-slate-700">
-                      {item.kategori}
+                      {item.kategori || "-"}
                     </td>
 
-                    <td className="px-5 py-4 text-slate-700">{item.merk}</td>
+                    <td className="px-5 py-4 text-slate-700">
+                      {item.merk || "-"}
+                    </td>
 
                     <td className="px-5 py-4 text-slate-700">
                       {item.kapasitasMesin || "-"}
@@ -573,7 +650,9 @@ export default function AdminSparepartPage() {
                       {formatRupiah(item.harga)}
                     </td>
 
-                    <td className="px-5 py-4 text-slate-700">{item.stok}</td>
+                    <td className="px-5 py-4 text-slate-700">
+                      {item.stok || 0}
+                    </td>
 
                     <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">

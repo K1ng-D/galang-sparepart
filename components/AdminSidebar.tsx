@@ -47,11 +47,6 @@ const menus = [
     href: "/admin/users",
     icon: Users,
   },
-  {
-    name: "Pengaturan",
-    href: "/admin/pengaturan",
-    icon: Settings,
-  },
 ];
 
 export default function AdminSidebar() {

@@ -23,11 +23,33 @@ type HasilItem = {
   tipePenggunaan: string;
   budgetMin: number;
   budgetMax: number;
+
   piston?: SelectedSparepart | null;
   blokMesin?: SelectedSparepart | null;
   camshaft?: SelectedSparepart | null;
   fuelSystem?: SelectedSparepart | null;
   knalpot?: SelectedSparepart | null;
+
+  ecu?: SelectedSparepart | null;
+  oli?: SelectedSparepart | null;
+  kampasKopling?: SelectedSparepart | null;
+  perKopling?: SelectedSparepart | null;
+  throttleBody?: SelectedSparepart | null;
+  busi?: SelectedSparepart | null;
+  stangPiston?: SelectedSparepart | null;
+  klep?: SelectedSparepart | null;
+  perKlep?: SelectedSparepart | null;
+  intakeManifold?: SelectedSparepart | null;
+  radiator?: SelectedSparepart | null;
+  injector?: SelectedSparepart | null;
+  crankshaft?: SelectedSparepart | null;
+  pistonRing?: SelectedSparepart | null;
+  cylinderHead?: SelectedSparepart | null;
+  coil?: SelectedSparepart | null;
+  fuelPump?: SelectedSparepart | null;
+  airRadiator?: SelectedSparepart | null;
+  bateraiAki?: SelectedSparepart | null;
+
   deskripsi?: string;
   similarityScore: number;
 };
@@ -85,6 +107,23 @@ export default function DetailHasilPage() {
       currency: "IDR",
       maximumFractionDigits: 0,
     }).format(value || 0);
+  };
+
+  const renderPartCard = (label: string, part?: SelectedSparepart | null) => {
+    return (
+      <div className="rounded-xl bg-slate-50 p-3">
+        <p className="text-slate-500">{label}</p>
+        <p className="font-semibold">{part?.nama || "-"}</p>
+        {part?.merk && (
+          <p className="mt-1 text-xs text-slate-500">Merk: {part.merk}</p>
+        )}
+        {part?.harga ? (
+          <p className="mt-1 text-xs font-semibold text-orange-600">
+            {formatRupiah(part.harga)}
+          </p>
+        ) : null}
+      </div>
+    );
   };
 
   if (loading) {
@@ -233,7 +272,7 @@ export default function DetailHasilPage() {
                   </div>
                 </div>
 
-                <div className="grid gap-3 text-sm md:grid-cols-2 lg:grid-cols-3">
+                <div className="mb-4 grid gap-3 text-sm md:grid-cols-2 lg:grid-cols-4">
                   <div className="rounded-xl bg-slate-50 p-3">
                     <p className="text-slate-500">Jenis Motor</p>
                     <p className="font-semibold">{item.jenisMotor}</p>
@@ -256,37 +295,38 @@ export default function DetailHasilPage() {
                       {formatRupiah(item.budgetMax)}
                     </p>
                   </div>
+                </div>
 
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <p className="text-slate-500">Piston</p>
-                    <p className="font-semibold">{item.piston?.nama || "-"}</p>
-                  </div>
+                <h4 className="mb-3 font-bold text-slate-900">
+                  Detail Sparepart
+                </h4>
 
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <p className="text-slate-500">Blok Mesin</p>
-                    <p className="font-semibold">
-                      {item.blokMesin?.nama || "-"}
-                    </p>
-                  </div>
+                <div className="grid gap-3 text-sm md:grid-cols-2 lg:grid-cols-3">
+                  {renderPartCard("Piston", item.piston)}
+                  {renderPartCard("Blok Mesin", item.blokMesin)}
+                  {renderPartCard("Camshaft", item.camshaft)}
+                  {renderPartCard("Sistem Bahan Bakar", item.fuelSystem)}
+                  {renderPartCard("Knalpot", item.knalpot)}
 
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <p className="text-slate-500">Camshaft</p>
-                    <p className="font-semibold">
-                      {item.camshaft?.nama || "-"}
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <p className="text-slate-500">Sistem Bahan Bakar</p>
-                    <p className="font-semibold">
-                      {item.fuelSystem?.nama || "-"}
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl bg-slate-50 p-3">
-                    <p className="text-slate-500">Knalpot</p>
-                    <p className="font-semibold">{item.knalpot?.nama || "-"}</p>
-                  </div>
+                  {renderPartCard("Ecu", item.ecu)}
+                  {renderPartCard("Oli", item.oli)}
+                  {renderPartCard("Kampas Kopling", item.kampasKopling)}
+                  {renderPartCard("Per Kopling", item.perKopling)}
+                  {renderPartCard("Throttle Body", item.throttleBody)}
+                  {renderPartCard("Busi", item.busi)}
+                  {renderPartCard("Stang Piston", item.stangPiston)}
+                  {renderPartCard("Klep", item.klep)}
+                  {renderPartCard("Per Klep", item.perKlep)}
+                  {renderPartCard("Intake Manifold", item.intakeManifold)}
+                  {renderPartCard("Radiator", item.radiator)}
+                  {renderPartCard("Injector", item.injector)}
+                  {renderPartCard("Crankshaft / Kruk As", item.crankshaft)}
+                  {renderPartCard("Piston Ring", item.pistonRing)}
+                  {renderPartCard("Cylinder Head", item.cylinderHead)}
+                  {renderPartCard("Coil", item.coil)}
+                  {renderPartCard("Fuel Pump", item.fuelPump)}
+                  {renderPartCard("Air Radiator", item.airRadiator)}
+                  {renderPartCard("Baterai / Aki", item.bateraiAki)}
                 </div>
               </div>
             ))
